@@ -7,10 +7,16 @@ class UserController extends Base {
   }
 
   async all (req, res) {
-    let result   = await GetAllUserAction.run()
-    let response = this.response.Ok(result)
+    try {
+      let result   = await GetAllUserAction.run()
+      let response = this.response.Ok(result)
 
-    return res.status(response.code).json(response)
+      return res.status(response.code).json(response)
+    } catch (err) {
+      console.error(err)
+
+      return res.status(500).json(this.response.Error())
+    }
   }
 }
 

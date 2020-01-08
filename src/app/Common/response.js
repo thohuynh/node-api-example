@@ -1,7 +1,7 @@
 import { getFrom, getTo, getNextPageUrl, getPrevPageUrl } from '../Heplers/global'
 
 class Response {
-  Error (message, code = 500) {
+  Error (message = 'SERVER_ERROR', code = 500) {
     return {
       status:  false,
       data:    null,

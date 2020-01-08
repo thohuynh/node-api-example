@@ -37,7 +37,7 @@ async function startServer () {
     // })
 
   } catch (exception) {
-    console.log(exception)
+    console.error(exception)
 
     // handle exception
   }
