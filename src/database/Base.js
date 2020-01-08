@@ -12,5 +12,5 @@ export default async () => {
 
   const connection = await mongoose.connect(connStr, config);
 
-  return connection.connection.db;
+  return connection.connection;
 }
