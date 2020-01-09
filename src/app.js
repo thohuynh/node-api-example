@@ -4,8 +4,8 @@ import http from 'http'
 import SocketServer from './modules/Socket/socketServer'
 import config from './config'
 import Middleware from './app/Http/Middleware'
-import api from "./routes";
-import './app/Console/contact'
+import api from './routes'
+import log from './app/Heplers/log'
 
 async function startServer () {
   const app = express();
@@ -36,8 +36,8 @@ async function startServer () {
     //   }
     //   console.log(`Your server is ready in port ${ config.app.port } !`)
     // })
-
   } catch (exception) {
+    log.error(exception)
     console.error(exception)
 
     // handle exception
