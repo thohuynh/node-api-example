@@ -1,2 +1,3 @@
-# node-example
-node example source
+# node-lara
+
+How to build a laravel with nodejs =))

@@ -3,6 +3,12 @@ import _ from 'lodash'
 import Mail from 'nodemailer'
 import config from '../../config'
 
+/**
+ * BaseMail
+ *
+ * @send
+ *@sendMany
+ */
 export default class BaseMail {
   constructor () {
     this.mail = Mail.createTransport({

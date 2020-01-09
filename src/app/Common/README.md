@@ -1,0 +1,3 @@
+# Commons
+
+- Define Commons in project same `response`, `pagination`, ...
