@@ -3,3 +3,4 @@ build
 yarn.lock
 .idea
 node_modules
+package-lock.json
