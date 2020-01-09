@@ -5,6 +5,7 @@ import SocketServer from './modules/Socket/socketServer'
 import config from './config'
 import Middleware from './app/Http/Middleware'
 import api from "./routes";
+import './app/Console/contact'
 
 async function startServer () {
   const app = express();

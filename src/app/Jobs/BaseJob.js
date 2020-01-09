@@ -1,6 +1,12 @@
 import DB from '../../database/Base'
 import Agenda from 'agenda'
 
+/**
+ * BaseJob with mongodb
+ *
+ * @schedule
+ * @every
+ */
 export default class BaseJob {
   constructor () {
     this.agenda  = new Agenda()

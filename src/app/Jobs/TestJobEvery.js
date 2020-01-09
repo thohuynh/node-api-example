@@ -1,5 +1,8 @@
 import BaseJob from './BaseJob'
 
+/**
+ * TestJobEvery
+ */
 class TestJobEvery extends BaseJob {
   async run () {
     return super.every('TestJobEvery', '2 minutes');
