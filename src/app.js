@@ -1,47 +1,84 @@
 import loaders from './loaders'
 import express from 'express'
+import _ from 'lodash'
 import http from 'http'
 import SocketServer from './modules/Socket/socketServer'
 import config from './config'
-import Middleware from './app/Http/Middleware'
-import api from './routes'
+import routes from './routes'
 import log from './app/Heplers/log'
 
-async function startServer () {
-  const app = express();
+class Server {
+  constructor () {
+    this.app = express()
+  }
 
-  try {
-    await loaders({ expressApp: app })
+  async start () {
+    try {
+      // loaders
+      await loaders({ expressApp: this.app })
 
-    // Route api
-    app.use('/api/test', Middleware.auth, api.test)
-    app.use('/api/user', Middleware.auth, api.user)
+      // Routes
+      this.routes(routes)
 
-    /**
-     * if use socket => uncomment here
-     */
+      // Run app
+      if (config.app.useSocket) {
+        const server = http.Server(this.app)
 
-    const server = http.Server(app)
+        new SocketServer(server, config.app.port)
+      } else {
+        this.app.listen(config.app.port, err => {
+          if (err) {
+            console.log(err)
+            return
+          }
+          console.log(`Your server is ready in port ${ config.app.port } !`)
+        })
+      }
+    } catch (exception) {
+      throw new Error(exception)
+    }
+  }
 
-    new SocketServer(server, config.app.port)
+  routes (routes, parentUrl = '', parentMiddleware = (req, res, next) => { next() }) {
+    _.forEach(routes, (route) => {
+      route.url = parentUrl + route.url
 
-    /**
-     * if don't use socket => uncomment here
-     */
+      if (route.middleware) {
+        parentMiddleware = route.middleware
+      } else {
+        route.middleware = parentMiddleware
+      }
 
-    // app.listen(config.app.port, err => {
-    //   if (err) {
-    //     console.log(err)
-    //     return
-    //   }
-    //   console.log(`Your server is ready in port ${ config.app.port } !`)
-    // })
-  } catch (exception) {
-    log.error(exception)
-    console.error(exception)
+      if (route.child) {
+        this.routes(route.child, route.url, parentMiddleware)
+      }
 
-    // handle exception
+      if (route.route) {
+        this.registerRoute(route)
+      }
+    })
+  }
+
+  registerRoute (route) {
+    if (route.middleware && route.route) {
+      this.app.use(route.url, route.middleware, route.route)
+    }
+
+    if (route.route && !route.middleware) {
+      this.app.use(route.url, route.route)
+    }
+  }
+
+  baseMiddleware (error, req, res, next) {
+    return next()
   }
 }
 
-startServer()
+const server = new Server()
+server.start()
+      .then(success => {
+      })
+      .catch(error => {
+        log.error(error)
+        console.error(error)
+      })

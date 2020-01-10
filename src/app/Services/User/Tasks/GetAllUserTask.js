@@ -1,10 +1,10 @@
-import UserModel from '../../../Entities/User'
+import UserRepository from '../../../Repositories/UserRepository'
 import Task from '../../Task'
 
 class GetAllUserTask extends Task {
 
   async run () {
-    return await UserModel.find({})
+    return await UserRepository.all()
   }
 }
 
