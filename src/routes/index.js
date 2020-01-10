@@ -5,10 +5,10 @@ import user from './api/user'
 export default [
   {
     url: '/api',
+    middleware: Middleware.auth,
     child: [
       {
         url: '/test',
-        middleware: Middleware.auth,
         route: test
       },
       {

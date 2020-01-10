@@ -42,24 +42,32 @@ class Server {
   routes (routes, parentUrl = '', parentMiddleware = (req, res, next) => { next() }) {
     _.forEach(routes, (route) => {
       route.url = parentUrl + route.url
+      let parentMiddlewareCurrent = []
 
       if (route.middleware) {
-        parentMiddleware = route.middleware
+        parentMiddlewareCurrent.push(route.middleware)
+        parentMiddlewareCurrent.push(parentMiddleware)
+        route.middleware = parentMiddlewareCurrent
+
       } else {
-        route.middleware = parentMiddleware
+        parentMiddlewareCurrent.push(parentMiddleware)
+        route.middleware = parentMiddlewareCurrent
       }
 
       if (route.child) {
-        this.routes(route.child, route.url, parentMiddleware)
+        this.routes(route.child, route.url, route.middleware)
       }
 
       if (route.route) {
-        this.registerRoute(route)
+        this.registerRoute(route, parentMiddlewareCurrent)
       }
     })
   }
 
-  registerRoute (route) {
+  registerRoute (route, parentMiddlewareCurrent) {
+    console.log(route.url)
+    console.log(parentMiddlewareCurrent)
+
     if (route.middleware && route.route) {
       this.app.use(route.url, route.middleware, route.route)
     }
