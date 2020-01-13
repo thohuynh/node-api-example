@@ -30,12 +30,15 @@
     "inquirer": "^7.0.3",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
+    "logform": "^2.1.2",
     "moment": "^2.24.0",
     "mongoose": "^5.8.5",
     "nodemailer": "^6.4.2",
     "pm2": "^4.2.1",
     "socket.io": "^2.3.0",
-    "validator": "^12.1.0"
+    "validator": "^12.1.0",
+    "winston": "^3.2.1",
+    "winston-daily-rotate-file": "^4.4.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

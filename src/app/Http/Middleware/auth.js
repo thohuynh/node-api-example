@@ -1,9 +1,10 @@
-import { responseError} from '../../Common/response'
+import response from '../../Common/response'
 
-export const authTest = (req, res, next) => {
+export const authTest = (req) => {
   if (req.token === 'token_test') {
-    return next()
+    //console.log(next())
+    return response.Ok(true)
   }
 
-  return res.status(401).json(responseError('Unauthorized', 401));
+  return response.Error('Unauthorized', 401)
 }
