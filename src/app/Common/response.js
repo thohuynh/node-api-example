@@ -45,13 +45,4 @@ class Response {
   }
 }
 
-export const responseError = (message, code = 500) => {
-  return {
-    status:  false,
-    data:    null,
-    message: message,
-    code:    code
-  }
-}
-
 export default new Response()

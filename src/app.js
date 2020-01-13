@@ -14,13 +14,19 @@ class Server {
 
   async start () {
     try {
-      // loaders
+      /**
+       * loaders
+       */
       await loaders({ expressApp: this.app })
 
-      // Routes
+      /**
+       * load Routes
+       */
       this.routes(routes)
 
-      // Run app
+      /**
+       * Run app
+       */
       if (config.app.useSocket) {
         const server = http.Server(this.app)
 
@@ -39,49 +45,84 @@ class Server {
     }
   }
 
-  routes (routes, parentUrl = '', parentMiddleware = (req, res, next) => { next() }) {
+  routes (routes, parentUrl = '', parentMiddleware = []) {
     _.forEach(routes, (route) => {
-      route.url = parentUrl + route.url
-      let parentMiddlewareCurrent = []
+      let currentMiddleware = []
+      route.url             = parentUrl + route.url
 
+      /**
+       * init middleware and convert to array
+       */
       if (route.middleware) {
-        parentMiddlewareCurrent.push(route.middleware)
-        parentMiddlewareCurrent.push(parentMiddleware)
-        route.middleware = parentMiddlewareCurrent
+        if ((typeof route.middleware) === 'function') {
+          route.middleware = [route.middleware]
+        }
 
+        currentMiddleware = currentMiddleware.concat(route.middleware)
+        currentMiddleware = currentMiddleware.concat(parentMiddleware)
       } else {
-        parentMiddlewareCurrent.push(parentMiddleware)
-        route.middleware = parentMiddlewareCurrent
+        currentMiddleware = currentMiddleware.concat(parentMiddleware)
       }
 
+      /**
+       * if have child -> call again
+       */
       if (route.child) {
+        route.middleware = currentMiddleware
         this.routes(route.child, route.url, route.middleware)
       }
 
+      /**
+       * register route
+       */
       if (route.route) {
-        this.registerRoute(route, parentMiddlewareCurrent)
+        this.registerRoute(route, currentMiddleware)
       }
     })
   }
 
   registerRoute (route, parentMiddlewareCurrent) {
-    console.log(route.url)
-    console.log(parentMiddlewareCurrent)
-
+    /**
+     * if have middleware
+     */
     if (route.middleware && route.route) {
-      this.app.use(route.url, route.middleware, route.route)
+      this.app.use(route.url, this.baseMiddleware(parentMiddlewareCurrent), route.route)
     }
 
+    /**
+     * if not have middleware
+     */
     if (route.route && !route.middleware) {
       this.app.use(route.url, route.route)
     }
   }
 
-  baseMiddleware (error, req, res, next) {
-    return next()
+  baseMiddleware (arrayMiddleware) {
+    /**
+     * return next or fail
+     */
+    return (req, res, next) => {
+      let responseError = {}
+
+      _.forEach(arrayMiddleware, (middleware) => {
+        if (middleware(req).status === false) {
+          responseError = middleware(req)
+        }
+      })
+
+      if (responseError.status === false) {
+        return res.status(responseError.code).json(responseError)
+      } else {
+        return next()
+      }
+    }
   }
 }
 
+/**
+ * start app
+ * @type {Server}
+ */
 const server = new Server()
 server.start()
       .then(success => {
